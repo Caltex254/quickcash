@@ -5,7 +5,9 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/", "destination": "/public/index.html" },
-    { "source": "/index.html", "destination": "/public/index.html" }
+    { "source": "/index.html", "destination": "/public/index.html" },
+    { "source": "/admin", "destination": "/public/admin.html" },
+    { "source": "/admin/", "destination": "/public/admin.html" }
   ],
   "functions": {
     "api/**/*.js": {
