@@ -20,7 +20,7 @@ module.exports = authMiddleware(async (req, res) => {
     try {
       const verifyResp = await axios.get(PAYMENT_BASE + '/payments/' + reference + '/status', {
         headers: { 'X-API-Key': PAYMENT_API_KEY },
-        timeout: 15000
+        timeout: 8000
       });
       const status = verifyResp.data.status;
       if (status === 'completed' || status === 'success') {

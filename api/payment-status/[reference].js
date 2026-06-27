@@ -22,11 +22,11 @@ module.exports = authMiddleware(async (req, res) => {
       return sendJson(res, 200, { status: 'completed', activated: true, user: updated.rows[0] });
     }
 
-    // Poll payment API for current status
+    // Poll payment API for current status (short timeout — polled every few seconds by client)
     try {
       const verifyResp = await axios.get(PAYMENT_BASE + '/payments/' + reference + '/status', {
         headers: { 'X-API-Key': PAYMENT_API_KEY },
-        timeout: 15000
+        timeout: 8000
       });
       const apiStatus = verifyResp.data.status;
       if (apiStatus === 'completed' || apiStatus === 'success') {

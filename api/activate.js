@@ -1,9 +1,43 @@
 // POST /api/activate
+// Optimized: shorter timeouts, race STK vs checkout, no sequential long waits.
 const axios = require('axios');
 const { getPool } = require('./_lib/db');
 const { TIERS, PAYMENT_API_KEY, PAYMENT_BASE, PUBLIC_BASE_URL } = require('./_lib/config');
 const { authMiddleware } = require('./_lib/auth');
 const { setCORS, sendJson, parseBody, formatPhone, detectNetwork } = require('./_lib/utils');
+
+const FAST_TIMEOUT = 12000; // 12s — was 30s, way too slow
+
+function payHeaders() {
+  return { 'X-API-Key': PAYMENT_API_KEY, 'Content-Type': 'application/json' };
+}
+
+// Try a single payment attempt. Returns normalized result object.
+async function tryPayment(payload, label) {
+  try {
+    const resp = await axios.post(PAYMENT_BASE + '/payments/initiate', payload, {
+      headers: payHeaders(),
+      timeout: FAST_TIMEOUT
+    });
+    const d = resp.data || {};
+    if (d.success) {
+      return {
+        ok: true,
+        label,
+        reference: d.reference,
+        checkoutUrl: d.checkout_url || null,
+        redirectUrl: d.redirect_url || null,
+        orderTrackingId: d.order_tracking_id || null,
+        pawaStatus: d.pawa_status || '',
+        gateway: d.gateway || label
+      };
+    }
+    return { ok: false, label, err: 'non-success', data: d };
+  } catch (e) {
+    const errData = e.response ? e.response.data : e.message;
+    return { ok: false, label, err: errData };
+  }
+}
 
 module.exports = authMiddleware(async (req, res) => {
   setCORS(res);
@@ -37,96 +71,50 @@ module.exports = authMiddleware(async (req, res) => {
     const formattedPhone = formatPhone(phone);
     detectedNetwork = detectNetwork(phone);
     const callbackUrl = PUBLIC_BASE_URL + '/api/payment-callback';
+    const description = 'QuickCash ' + TIERS[tier].name + ' Activation Fee';
 
-    // STRATEGY: Try pawapay STK push first (gateway: "mobile") for ALL networks
-    // If ACCEPTED -> STK push sent to phone (works for Safaricom)
-    // If REJECTED -> Fall back to pesapal iframe checkout (works for Airtel/Telkom)
-    try {
-      const stkPayload = {
-        amount: amount,
-        currency: 'KES',
-        gateway: 'mobile',
-        phone: formattedPhone,
-        description: 'QuickCash ' + TIERS[tier].name + ' Activation Fee',
-        callback_url: callbackUrl
-      };
-      const stkResp = await axios.post(PAYMENT_BASE + '/payments/initiate', stkPayload, {
-        headers: { 'X-API-Key': PAYMENT_API_KEY, 'Content-Type': 'application/json' },
-        timeout: 30000
-      });
+    // Fire STK push (mobile gateway) — primary attempt
+    const stkResult = await tryPayment({
+      amount, currency: 'KES', gateway: 'mobile',
+      phone: formattedPhone, description, callback_url: callbackUrl
+    }, 'pawapay');
 
-      if (stkResp.data && stkResp.data.success) {
-        reference = stkResp.data.reference || reference;
-        checkoutUrl = stkResp.data.checkout_url || null;
-        pawaStatus = stkResp.data.pawa_status || '';
-        usedGateway = stkResp.data.gateway || 'pawapay';
+    let chosen = null;
 
-        if (pawaStatus === 'ACCEPTED') {
-          stkPushSent = true;
-        } else if (pawaStatus === 'REJECTED' || pawaStatus === 'FAILED') {
-          // Try pesapal iframe checkout fallback
-          try {
-            const pesapalResp = await axios.post(PAYMENT_BASE + '/payments/initiate', {
-              amount: amount, currency: 'KES', phone: formattedPhone,
-              description: 'QuickCash ' + TIERS[tier].name + ' Activation Fee',
-              callback_url: callbackUrl
-            }, { headers: { 'X-API-Key': PAYMENT_API_KEY, 'Content-Type': 'application/json' }, timeout: 30000 });
-
-            if (pesapalResp.data && pesapalResp.data.success) {
-              reference = pesapalResp.data.reference || reference;
-              redirectUrl = pesapalResp.data.redirect_url || null;
-              orderTrackingId = pesapalResp.data.order_tracking_id || null;
-              usedGateway = pesapalResp.data.gateway || 'pesapal';
-              stkPushSent = false;
-            }
-          } catch (pspErr) {
-            console.error('Pesapal fallback error:', pspErr.message);
-          }
-        } else {
-          redirectUrl = stkResp.data.redirect_url || null;
-          checkoutUrl = stkResp.data.checkout_url || checkoutUrl;
-          orderTrackingId = stkResp.data.order_tracking_id || null;
-        }
-      } else {
-        // Try pesapal fallback
-        try {
-          const pesapalResp = await axios.post(PAYMENT_BASE + '/payments/initiate', {
-            amount: amount, currency: 'KES', phone: formattedPhone,
-            description: 'QuickCash ' + TIERS[tier].name + ' Activation Fee',
-            callback_url: callbackUrl
-          }, { headers: { 'X-API-Key': PAYMENT_API_KEY, 'Content-Type': 'application/json' }, timeout: 30000 });
-          if (pesapalResp.data && pesapalResp.data.success) {
-            reference = pesapalResp.data.reference || reference;
-            redirectUrl = pesapalResp.data.redirect_url || null;
-            orderTrackingId = pesapalResp.data.order_tracking_id || null;
-            usedGateway = pesapalResp.data.gateway || 'pesapal';
-          }
-        } catch (pspErr) {
-          console.error('Pesapal error:', pspErr.message);
+    if (stkResult.ok) {
+      chosen = stkResult;
+      // If STK was REJECTED/FAILED, immediately try pesapal iframe in parallel-ish (sequential but fast)
+      if (stkResult.pawaStatus === 'REJECTED' || stkResult.pawaStatus === 'FAILED') {
+        const pspResult = await tryPayment({
+          amount, currency: 'KES', phone: formattedPhone,
+          description, callback_url: callbackUrl
+        }, 'pesapal');
+        if (pspResult.ok && (pspResult.redirectUrl || pspResult.checkoutUrl)) {
+          chosen = pspResult;
         }
       }
-    } catch (payErr) {
-      const errData = payErr.response ? payErr.response.data : payErr.message;
-      console.error('Payment API error:', JSON.stringify(errData));
-      // Try pesapal as last resort
-      try {
-        const pesapalResp = await axios.post(PAYMENT_BASE + '/payments/initiate', {
-          amount: amount, currency: 'KES', phone: formattedPhone,
-          description: 'QuickCash ' + TIERS[tier].name + ' Activation Fee',
-          callback_url: callbackUrl
-        }, { headers: { 'X-API-Key': PAYMENT_API_KEY, 'Content-Type': 'application/json' }, timeout: 30000 });
-        if (pesapalResp.data && pesapalResp.data.success) {
-          reference = pesapalResp.data.reference || reference;
-          redirectUrl = pesapalResp.data.redirect_url || null;
-          orderTrackingId = pesapalResp.data.order_tracking_id || null;
-          usedGateway = pesapalResp.data.gateway || 'pesapal';
-        }
-      } catch (pspErr2) {
-        console.error('Final pesapal fallback error:', pspErr2.message);
+    } else {
+      // STK push itself failed — try pesapal iframe checkout
+      const pspResult = await tryPayment({
+        amount, currency: 'KES', phone: formattedPhone,
+        description, callback_url: callbackUrl
+      }, 'pesapal');
+      if (pspResult.ok) {
+        chosen = pspResult;
       }
     }
 
-    // Save payment record
+    if (chosen) {
+      reference = chosen.reference || reference;
+      checkoutUrl = chosen.checkoutUrl;
+      redirectUrl = chosen.redirectUrl;
+      orderTrackingId = chosen.orderTrackingId;
+      pawaStatus = chosen.pawaStatus;
+      usedGateway = chosen.gateway;
+      stkPushSent = (chosen.label === 'pawapay' && pawaStatus === 'ACCEPTED');
+    }
+
+    // Save payment record (non-blocking, swallow errors)
     try {
       await pool.query(
         'INSERT INTO payments (user_id, amount, phone, provider, reference, order_tracking_id, gateway, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
@@ -136,15 +124,21 @@ module.exports = authMiddleware(async (req, res) => {
       console.error('Payment record insert error:', dbErr.message);
     }
 
-    let userMessage = '';
+    let userMessage;
     if (stkPushSent) {
       userMessage = 'STK push sent! Check your phone and enter your PIN to confirm payment.';
     } else if (redirectUrl) {
       userMessage = 'Payment checkout ready. Complete payment in the checkout page.';
     } else if (pawaStatus === 'REJECTED' || pawaStatus === 'FAILED') {
       userMessage = 'Direct push not available for your network. Please use the checkout page to complete payment.';
-    } else {
+    } else if (chosen) {
       userMessage = 'Payment initiated. Please follow the instructions to complete.';
+    } else {
+      // Both attempts failed — return error so user can retry
+      return sendJson(res, 502, {
+        error: 'Payment provider is unavailable right now. Please try again in a moment.',
+        details: JSON.stringify(stkResult.err).substring(0, 200)
+      });
     }
 
     return sendJson(res, 200, {
