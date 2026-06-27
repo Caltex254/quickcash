@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quick Cash Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh;overflow-x:hidden}
+
+#splash{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000;transition:opacity .5s}
+#splash .logo{width:100px;height:100px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:900;color:#fff;box-shadow:0 10px 40px rgba(255,215,0,.4);animation:pulse 2s infinite}
+#splash h1{margin-top:20px;font-size:28px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+#splash p{margin-top:8px;color:rgba(255,255,255,.8);font-size:14px}
+#splash .loader{margin-top:30px;width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:#ffd700;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#home-screen{display:none;min-height:100vh;background:#f0f2f5}
+.home-hero{position:relative;padding:60px 24px 48px;text-align:center;overflow:hidden;background:linear-gradient(180deg,#667eea 0%,#764ba2 100%)}
+.home-hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 60%);pointer-events:none}
+.home-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent)}
+.hero-logo-wrap{margin-bottom:20px}
+.home-hero .hero-logo{width:90px;height:90px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:24px;display:inline-flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#fff;box-shadow:0 12px 40px rgba(255,215,0,.3)}
+.home-hero h1{font-size:30px;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.2);margin-bottom:8px;letter-spacing:-0.5px}
+.home-hero .hero-sub{font-size:16px;color:rgba(255,255,255,.85);line-height:1.6;max-width:340px;margin:0 auto}
+.hero-badges{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:30px;font-size:12px;color:#fff;font-weight:600}
+.hero-badge svg{width:14px;height:14px;fill:#ffd700}
+
+.home-stats-bar{display:flex;justify-content:center;gap:0;padding:0;margin:0;background:#fff;border-bottom:1px solid #e8e8e8}
+.home-stat{flex:1;text-align:center;padding:20px 12px;position:relative}
+.home-stat:not(:last-child)::after{content:'';position:absolute;right:0;top:25%;height:50%;width:1px;background:#e8e8e8}
+.home-stat .hs-num{font-size:22px;font-weight:900;color:#764ba2}
+.home-stat .hs-label{font-size:10px;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+
+.home-section{padding:28px 24px 0}
+.home-section-title{font-size:18px;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:10px;color:#1a1a2e}
+.home-section-title .icon-wrap{width:28px;height:28px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.home-section-title .icon-wrap svg{width:16px;height:16px;fill:#fff}
+
+.how-steps{display:flex;flex-direction:column;gap:0;position:relative;padding-left:18px}
+.how-steps::before{content:'';position:absolute;left:35px;top:18px;bottom:18px;width:2px;background:linear-gradient(180deg,#ffd700,rgba(255,215,0,.1))}
+.how-step{display:flex;gap:16px;padding:16px 0;align-items:flex-start;position:relative}
+.step-num{width:36px;height:36px;min-width:36px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;z-index:1;box-shadow:0 4px 16px rgba(102,126,234,.3)}
+.step-content h3{font-size:15px;font-weight:700;margin-bottom:4px;color:#1a1a2e}
+.step-content p{font-size:13px;color:#666;line-height:1.6}
+
+.tier-cards-home{display:flex;flex-direction:column;gap:12px}
+.tier-card-home{background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tier-card-home:active{transform:scale(.98)}
+.tier-card-home.silver{border-left:3px solid #c0c0c0}
+.tier-card-home.gold{border-left:3px solid #ffd700}
+.tier-card-home.vip{border-left:3px solid #9b59b6}
+.tier-card-home .tc-glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.08}
+.tier-card-home.silver .tc-glow{background:radial-gradient(circle,#c0c0c0,transparent)}
+.tier-card-home.gold .tc-glow{background:radial-gradient(circle,#ffd700,transparent)}
+.tier-card-home.vip .tc-glow{background:radial-gradient(circle,#9b59b6,transparent)}
+.tc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.tc-name{font-size:16px;font-weight:800}
+.tc-badge{font-size:10px;padding:4px 10px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.tc-earn{font-size:14px;color:#555;margin-bottom:6px;font-weight:500}
+.tc-tasks{font-size:12px;color:#888;margin-bottom:8px}
+.tc-fee{font-size:12px;color:#764ba2;font-weight:600;display:flex;align-items:center;gap:4px}
+.tc-fee svg{width:12px;height:12px;fill:#764ba2}
+.tc-perks{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.tc-perk{font-size:10px;padding:4px 8px;background:#f0f2f5;border-radius:6px;color:#555;font-weight:500}
+
+.testimonials-scroll{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.testimonials-scroll::-webkit-scrollbar{display:none}
+.testimonial-card{min-width:280px;max-width:280px;background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:20px;scroll-snap-align:start;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.testimonial-card .tc-stars{color:#ffd700;font-size:13px;margin-bottom:10px;letter-spacing:2px}
+.testimonial-card .tc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.testimonial-card .tc-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#080818}
+.testimonial-card .tc-name{font-size:14px;font-weight:700;color:#1a1a2e}
+.testimonial-card .tc-role{font-size:11px;color:#888;margin-top:2px}
+.testimonial-card .tc-text{font-size:13px;color:#555;line-height:1.7}
+
+.home-cta{padding:32px 24px 40px;display:flex;flex-direction:column;gap:12px}
+.cta-primary{width:100%;padding:18px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:16px;font-size:17px;font-weight:800;cursor:pointer;transition:all .3s;box-shadow:0 8px 32px rgba(102,126,234,.3)}
+.cta-primary:active{transform:scale(.98);box-shadow:0 4px 16px rgba(102,126,234,.2)}
+.cta-secondary{width:100%;padding:16px;background:#fff;border:2px solid #764ba2;color:#764ba2;border-radius:16px;font-size:15px;font-weight:600;cursor:pointer;transition:all .3s}
+.cta-secondary:active{background:#f0f2f5}
+
+.trust-section{padding:24px;text-align:center}
+.trust-logos{display:flex;justify-content:center;gap:20px;align-items:center;opacity:.6}
+.trust-logos span{font-size:12px;font-weight:600;color:#555;letter-spacing:1px}
+
+#auth-screen{display:none;min-height:100vh;padding:40px 24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+#auth-screen .auth-container{max-width:400px;margin:0 auto}
+#auth-screen .auth-logo{text-align:center;margin-bottom:30px}
+#auth-screen .auth-logo .icon{width:70px;height:70px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;box-shadow:0 8px 24px rgba(255,215,0,.3)}
+#auth-screen .auth-logo h2{margin-top:10px;font-size:22px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.2)}
+.auth-tabs{display:flex;margin-bottom:24px;background:rgba(255,255,255,.15);border-radius:12px;padding:4px}
+.auth-tab{flex:1;padding:12px;text-align:center;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;color:rgba(255,255,255,.7);transition:all .3s}
+.auth-tab.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#fff;box-shadow:0 4px 16px rgba(255,215,0,.3)}
+.auth-form{display:none}.auth-form.active{display:block}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:#aaa;margin-bottom:6px;font-weight:500}
+.form-group input,.form-group select{width:100%;padding:14px 16px;background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.3);border-radius:12px;color:#1a1a2e;font-size:15px;outline:none;transition:border-color .3s}
+.form-group input:focus,.form-group select:focus{border-color:#ffd700}
+.form-group input::placeholder{color:#999}
+.form-group select option{background:#fff;color:#1a1a2e}
+.auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;transition:transform .2s;box-shadow:0 4px 16px rgba(255,215,0,.3)}
+.auth-btn:active{transform:scale(.98)}
+.auth-error{color:#ff4444;font-size:13px;margin-top:8px;display:none}
+.auth-back{display:block;text-align:center;color:#ffd700;font-size:13px;margin-top:16px;cursor:pointer;text-decoration:none}
+
+#app{display:none;min-height:100vh;padding-bottom:70px;background:#f0f2f5}
+.app-header{background:linear-gradient(135deg,#667eea,#764ba2);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.app-header .user-info{display:flex;align-items:center;gap:10px}
+.app-header .avatar{width:36px;height:36px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px}
+.app-header .greeting{font-size:13px;color:rgba(255,255,255,.8)}
+.app-header .username{font-size:16px;font-weight:700;color:#fff}
+.app-header .tier-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
+.tier-silver{background:linear-gradient(135deg,#c0c0c0,#808080);color:#000}
+.tier-gold{background:linear-gradient(135deg,#ffd700,#daa520);color:#000}
+.tier-vip{background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;box-shadow:0 -2px 8px rgba(0,0,0,.08);display:flex;z-index:100;padding:8px 0 env(safe-area-inset-bottom,8px)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;cursor:pointer;color:#bbb;transition:all .3s;position:relative}
+.nav-item.active.nav-tasks{color:#3b82f6}
+.nav-item.active.nav-earnings{color:#10b981}
+.nav-item.active.nav-payment{color:#f59e0b}
+.nav-item.active.nav-profile{color:#8b5cf6}
+.nav-item.active::after{content:'';position:absolute;bottom:2px;width:16px;height:3px;border-radius:2px}
+.nav-item.active.nav-tasks::after{background:#3b82f6}
+.nav-item.active.nav-earnings::after{background:#10b981}
+.nav-item.active.nav-payment::after{background:#f59e0b}
+.nav-item.active.nav-profile::after{background:#8b5cf6}
+.nav-item svg{width:22px;height:22px;margin-bottom:4px}
+.nav-item span{font-size:10px;font-weight:600}
+
+.tab-content{display:none;padding:16px}.tab-content.active{display:block}
+
+.balance-card{background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:20px;padding:24px;margin-bottom:16px;text-align:center;box-shadow:0 4px 16px rgba(102,126,234,.3)}
+.balance-card .label{font-size:13px;color:rgba(255,255,255,.8);margin-bottom:4px}
+.balance-card .amount{font-size:36px;font-weight:900;color:#fff}
+.balance-card .tier-info{margin-top:12px;font-size:12px;color:rgba(255,255,255,.6)}
+
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-size:16px;font-weight:700;color:#1a1a2e}
+
+.tier-selector{display:flex;gap:8px;margin-bottom:16px}
+.tier-sel-btn{flex:1;padding:12px 8px;background:#fff;border:2px solid #e8e8e8;border-radius:12px;text-align:center;cursor:pointer;transition:all .3s}
+.tier-sel-btn.active{border-color:#764ba2;background:rgba(118,75,162,.06)}
+.tier-sel-btn .ts-name{font-size:14px;font-weight:700;color:#1a1a2e}
+.tier-sel-btn .ts-earn{font-size:11px;color:#888;margin-top:2px}
+.tier-sel-btn .ts-fee{font-size:11px;color:#764ba2;margin-top:2px}
+
+.task-card{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:18px;margin-bottom:10px;transition:all .3s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.task-card:not(.completed):active{border-color:#764ba2;box-shadow:0 2px 8px rgba(118,75,162,.1)}
+.task-card .task-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.task-card .task-type-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:4px 10px;border-radius:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.task-card .task-type-badge.type-survey{background:rgba(59,130,246,.12);color:#60a5fa}
+.task-card .task-type-badge.type-market{background:rgba(16,185,129,.12);color:#34d399}
+.task-card .task-type-badge.type-premium{background:rgba(155,89,182,.12);color:#c084fc}
+.task-card .task-type-badge.type-review{background:rgba(245,158,11,.12);color:#fbbf24}
+.task-card .task-type-badge.type-analysis{background:rgba(236,72,153,.12);color:#f472b6}
+.task-card .task-type-badge.type-strategy{background:rgba(99,102,241,.12);color:#818cf8}
+.task-card .task-type-badge.type-research{background:rgba(6,182,212,.12);color:#22d3ee}
+.task-card .task-type-badge.type-investment{background:rgba(234,179,8,.12);color:#eab308}
+.task-card .task-type-badge.type-corporate{background:rgba(168,85,247,.12);color:#a855f7}
+.task-card .task-reward{font-size:15px;font-weight:800;color:#4ade80;display:flex;align-items:center;gap:4px}
+.task-card .task-question{font-size:14px;margin-bottom:14px;color:#333;line-height:1.6;font-weight:500}
+.task-options{display:flex;flex-direction:column;gap:8px}
+.task-option{padding:12px 14px;background:#f8f8fa;border:1px solid #e8e8e8;border-radius:10px;font-size:13px;cursor:pointer;transition:all .3s;color:#555;line-height:1.4}
+.task-option:active{border-color:#764ba2;background:rgba(118,75,162,.05)}
+.task-option.selected{border-color:#764ba2;background:rgba(118,75,162,.08);color:#1a1a2e}
+.task-card.completed{opacity:.4}
+.task-card.completed .task-reward{color:#666}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.stat-card .stat-value{font-size:20px;font-weight:800;color:#764ba2}
+.stat-card .stat-label{font-size:11px;color:#888;margin-top:4px}
+
+.provider-options{display:flex;gap:10px;margin-bottom:16px}
+.provider-option{flex:1;background:#fff;border:2px solid #e8e8e8;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .3s}
+.provider-option.selected{border-color:#764ba2;background:rgba(118,75,162,.06)}
+.provider-option .provider-icon{font-size:24px;margin-bottom:4px}
+.provider-option .provider-name{font-size:11px;font-weight:600;color:#888}
+.provider-option.selected .provider-name{color:#764ba2}
+
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:12px;box-shadow:0 4px 16px rgba(102,126,234,.3)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-secondary{width:100%;padding:12px;background:#fff;border:1px solid #e8e8e8;color:#555;border-radius:12px;font-size:14px;cursor:pointer;margin-top:8px}
+.btn-logout{width:100%;padding:14px;background:#fff;border:1px solid #ff4444;color:#ff4444;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px}
+
+.activation-card{background:linear-gradient(135deg,rgba(118,75,162,.08),rgba(102,126,234,.04));border:1px solid rgba(118,75,162,.15);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px}
+.activation-card h3{font-size:18px;color:#764ba2;margin-bottom:8px}
+.activation-card p{font-size:13px;color:#666;margin-bottom:12px;line-height:1.6}
+.activation-card .fee-amount{font-size:28px;font-weight:900;color:#764ba2;margin:8px 0}
+
+.profile-section{text-align:center;margin-bottom:20px}
+.profile-avatar{width:80px;height:80px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:20px;display:inline-flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;color:#fff;margin-bottom:12px}
+.profile-name{font-size:20px;font-weight:700;color:#1a1a2e}
+.profile-phone{font-size:13px;color:#888;margin-top:4px}
+
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:200}
+.modal{background:#fff;border:1px solid #e8e8e8;border-radius:20px;padding:24px;width:90%;max-width:400px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.modal h3{font-size:18px;margin-bottom:12px;color:#1a1a2e}
+.modal p{font-size:14px;color:#666;margin-bottom:16px;line-height:1.6}
+.modal .btn-primary{margin-top:8px}
+.modal .btn-close{width:100%;padding:12px;background:#f0f2f5;border:none;border-radius:12px;color:#555;font-size:14px;cursor:pointer;margin-top:8px}
+
+.withdraw-form .form-group input,.withdraw-form .form-group select{width:100%;padding:14px 16px;background:#fff;border:1px solid #e8e8e8;border-radius:12px;color:#1a1a2e;font-size:15px;outline:none}
+.withdraw-form select{appearance:none;-webkit-appearance:none}
+.withdraw-form select option{background:#fff;color:#1a1a2e}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .3s ease}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#ccc;border-radius:4px}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="logo">Q</div>
+  <h1>Quick Cash Agency</h1>
+  <p>Earn. Withdraw. Repeat.</p>
+  <div class="loader"></div>
+</div>
+
+<div id="home-screen">
+  <div class="home-hero">
+    <div class="hero-logo-wrap">
+      <div class="hero-logo">Q</div>
+    </div>
+    <h1>Quick Cash Agency</h1>
+    <p class="hero-sub">Complete real tasks from top brands, earn real money, and withdraw instantly to your mobile wallet.</p>
+    <div class="hero-badges">
+      <span class="hero-badge"><svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> Trusted by 12,000+ Kenyans</span>
+      <span class="hero-badge"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> KES 48M+ Paid Out</span>
+    </div>
+  </div>
+
+  <div class="home-stats-bar">
+    <div class="home-stat"><div class="hs-num">KES 48M+</div><div class="hs-label">Paid Out</div></div>
+    <div class="home-stat"><div class="hs-num">12,000+</div><div class="hs-label">Members</div></div>
+    <div class="home-stat"><div class="hs-num">96%</div><div class="hs-label">Satisfaction</div></div>
+  </div>
+
+  <div class="home-section">
+    <div class="home-section-title">
+      <span class="icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>
+      How It Works
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <div class="step-content"><h3>Create Your Free Account</h3><p>Sign up with your phone number and choose your earning tier. Registration takes less than 30 seconds, and you can start earning immediately.</p></div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <div class="step-content"><h3>Complete Tasks & Earn</h3><p>Choose from consumer surveys, market research, product reviews, and more. Every completed task adds real money to your balance instantly.</p></div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <div class="step-content"><h3>Activate & Withdraw</h3><p>When you are ready to cash out, pay a small one-time activation fee based on your tier. Then withdraw your earnings directly to M-Pesa, Airtel Money, or Telkom.</p></div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <div class="step-content"><h3>Get Paid Instantly</h3><p>Your money is sent straight to your mobile wallet. No delays, no hidden charges, no complicated processes. What you earn is what you get.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-section">
+    <div class="home-section-title">
+      <span class="icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+      Choose Your Tier
+    </div>
+    <div class="tier-cards-home">
+      <div class="tier-card-home silver">
+        <div class="tc-glow"></div>
+        <div class="tc-header"><span class="tc-name">Silver Tier</span><span class="tc-badge tier-silver">Starter</span></div>
+        <div class="tc-earn">Earn KES 30 - 80 per task</div>
+        <div class="tc-tasks">30 tasks available daily</div>
+        <div class="tc-fee"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> Activation: KES 199 (at withdrawal)</div>
+        <div class="tc-perks"><span class="tc-perk">Consumer Surveys</span><span class="tc-perk">Product Feedback</span><span class="tc-perk">Lifestyle Research</span></div>
+      </div>
+      <div class="tier-card-home gold">
+        <div class="tc-glow"></div>
+        <div class="tc-header"><span class="tc-name">Gold Tier</span><span class="tc-badge tier-gold">Popular</span></div>
+        <div class="tc-earn">Earn KES 100 - 250 per task</div>
+        <div class="tc-tasks">30 tasks available daily</div>
+        <div class="tc-fee"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> Activation: KES 299 (at withdrawal)</div>
+        <div class="tc-perks"><span class="tc-perk">Business Surveys</span><span class="tc-perk">Investment Research</span><span class="tc-perk">Digital Reviews</span></div>
+      </div>
+      <div class="tier-card-home vip">
+        <div class="tc-glow"></div>
+        <div class="tc-header"><span class="tc-name">VIP Tier</span><span class="tc-badge tier-vip">Premium</span></div>
+        <div class="tc-earn">Earn KES 300 - 800 per task</div>
+        <div class="tc-tasks">30 tasks available daily</div>
+        <div class="tc-fee"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> Activation: KES 399 (at withdrawal)</div>
+        <div class="tc-perks"><span class="tc-perk">Strategic Analysis</span><span class="tc-perk">Portfolio Reviews</span><span class="tc-perk">Executive Surveys</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-section">
+    <div class="home-section-title">
+      <span class="icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
+      What Our Members Say
+    </div>
+    <div class="testimonials-scroll">
+      <div class="testimonial-card">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="tc-top">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">W</div>
+          <div><div class="tc-name">Wanjiku M.</div><div class="tc-role">Gold Tier - Nairobi</div></div>
+        </div>
+        <div class="tc-text">"I was skeptical at first, but Quick Cash Agency is the real deal. I earn between KES 800-1,500 daily from Gold tier tasks. The withdrawal to M-Pesa is instant!"</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="tc-top">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,#10b981,#059669)">B</div>
+          <div><div class="tc-name">Brian O.</div><div class="tc-role">VIP Tier - Mombasa</div></div>
+        </div>
+        <div class="tc-text">"VIP tier changed everything for me. The premium research tasks pay so well. I made KES 5,200 in my first week and the withdrawal was seamless."</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+        <div class="tc-top">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706)">A</div>
+          <div><div class="tc-name">Amina K.</div><div class="tc-role">Silver Tier - Kisumu</div></div>
+        </div>
+        <div class="tc-text">"As a student, Quick Cash Agency helps me earn pocket money between classes. The surveys are easy and I can do them anywhere. Already withdrawn twice!"</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="tc-top">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">D</div>
+          <div><div class="tc-name">David N.</div><div class="tc-role">Gold Tier - Nakuru</div></div>
+        </div>
+        <div class="tc-text">"I upgraded to Gold tier after starting with Silver and the difference is huge. The business surveys are interesting and pay really well. Best decision I made!"</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="tc-top">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,#ec4899,#db2777)">G</div>
+          <div><div class="tc-name">Grace W.</div><div class="tc-role">VIP Tier - Eldoret</div></div>
+        </div>
+        <div class="tc-text">"I run a small business and the VIP investment surveys are surprisingly insightful. Plus I earn while learning about market trends. Quick Cash is a win-win!"</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="tc-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="tc-top">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,#06b6d4,#0891b2)">J</div>
+          <div><div class="tc-name">James M.</div><div class="tc-role">Silver Tier - Thika</div></div>
+        </div>
+        <div class="tc-text">"I use Quick Cash during my commute. The surveys take just a few minutes each and the money adds up fast. Already earned enough to pay my monthly data bundle!"</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="trust-section">
+    <div class="trust-logos">
+      <span>SAFARICOM</span>
+      <span>&bull;</span>
+      <span>AIRTEL</span>
+      <span>&bull;</span>
+      <span>TELKOM</span>
+    </div>
+  </div>
+
+  <div class="home-cta">
+    <button class="cta-primary" onclick="showAuthScreen('signup')">Get Started - It's Free</button>
+    <button class="cta-secondary" onclick="showAuthScreen('login')">Already have an account? Login</button>
+  </div>
+</div>
+
+<div id="auth-screen">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="icon">Q</div>
+      <h2>Quick Cash Agency</h2>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+      <div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div>
+    </div>
+    <div id="login-form" class="auth-form active">
+      <div class="form-group"><label>Phone Number</label><input type="tel" id="login-phone" placeholder="e.g. 254712345678"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="Enter your password"></div>
+      <div id="login-error" class="auth-error"></div>
+      <button class="auth-btn" onclick="handleLogin()">Login</button>
+      <a class="auth-back" onclick="showHomeScreen()">&#8592; Back to Home</a>
+    </div>
+    <div id="signup-form" class="auth-form">
+      <div class="form-group"><label>Username</label><input type="text" id="signup-username" placeholder="Choose a username"></div>
+      <div class="form-group"><label>Phone Number</label><input type="tel" id="signup-phone" placeholder="e.g. 254712345678"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="signup-password" placeholder="Create a password"></div>
+      <div class="form-group">
+        <label>Choose Your Tier</label>
+        <div class="tier-selector">
+          <div class="tier-sel-btn active" data-tier="silver" onclick="selectSignupTier(this)"><div class="ts-name">Silver</div><div class="ts-earn">KES 30-80/task</div><div class="ts-fee">Fee: KES 199</div></div>
+          <div class="tier-sel-btn" data-tier="gold" onclick="selectSignupTier(this)"><div class="ts-name">Gold</div><div class="ts-earn">KES 100-250/task</div><div class="ts-fee">Fee: KES 299</div></div>
+          <div class="tier-sel-btn" data-tier="vip" onclick="selectSignupTier(this)"><div class="ts-name">VIP</div><div class="ts-earn">KES 300-800/task</div><div class="ts-fee">Fee: KES 399</div></div>
+        </div>
+      </div>
+      <div id="signup-error" class="auth-error"></div>
+      <button class="auth-btn" onclick="handleSignup()">Create Account</button>
+      <a class="auth-back" onclick="showHomeScreen()">&#8592; Back to Home</a>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="app-header">
+    <div class="user-info">
+      <div class="avatar" id="header-avatar">Q</div>
+      <div><div class="greeting">Welcome back,</div><div class="username" id="header-username">User</div></div>
+    </div>
+    <span class="tier-badge tier-silver" id="header-tier">Silver</span>
+  </div>
+
+  <div id="tab-tasks" class="tab-content active">
+    <div class="balance-card">
+      <div class="label">Total Earnings</div>
+      <div class="amount" id="task-earnings">KES 0</div>
+      <div class="tier-info" id="task-tier-info">Silver Tier - 0/30 tasks done</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Choose Task Tier</span></div>
+      <div class="tier-selector" id="tier-switcher">
+        <div class="tier-sel-btn" data-tier="silver" onclick="switchTier('silver')"><div class="ts-name">Silver</div><div class="ts-earn">KES 30-80</div><div class="ts-fee">Fee: KES 199</div></div>
+        <div class="tier-sel-btn" data-tier="gold" onclick="switchTier('gold')"><div class="ts-name">Gold</div><div class="ts-earn">KES 100-250</div><div class="ts-fee">Fee: KES 299</div></div>
+        <div class="tier-sel-btn" data-tier="vip" onclick="switchTier('vip')"><div class="ts-name">VIP</div><div class="ts-earn">KES 300-800</div><div class="ts-fee">Fee: KES 399</div></div>
+      </div>
+    </div>
+    <div id="tasks-list"></div>
+  </div>
+
+  <div id="tab-earnings" class="tab-content">
+    <div class="balance-card">
+      <div class="label">Available Balance</div>
+      <div class="amount" id="earnings-balance">KES 0</div>
+      <div class="tier-info">Minimum withdrawal: KES 500</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Earnings Summary</span></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value" id="stat-tasks">0</div><div class="stat-label">Tasks Done</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-earnings">0</div><div class="stat-label">Total Earned</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-tier">Silver</div><div class="stat-label">Current Tier</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-status">Free</div><div class="stat-label">Withdraw Status</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-payment" class="tab-content">
+    <div class="balance-card">
+      <div class="label">Available Balance</div>
+      <div class="amount" id="payment-balance">KES 0</div>
+    </div>
+    <div id="activation-section" class="activation-card" style="display:none;">
+      <h3>Activation Required to Withdraw</h3>
+      <p>Pay the one-time activation fee for your tier to unlock withdrawals. You only pay when you are ready to cash out your earnings.</p>
+      <div class="fee-amount" id="activation-fee-display">KES 199</div>
+      <p id="activation-tier-label" style="color:#764ba2;font-weight:600;font-size:14px;margin-bottom:12px;">Silver Tier Fee</p>
+      <div class="form-group" style="text-align:left;">
+        <label>Phone Number (M-Pesa / Airtel Money)</label>
+        <input type="tel" id="activate-phone" placeholder="e.g. 0732384741 or 0712345678" style="width:100%;padding:12px;background:#fff;border:1px solid #ddd;border-radius:10px;color:#1a1a2e;font-size:14px;outline:none">
+        <p style="font-size:11px;color:#888;margin-top:6px;">All networks supported! Enter your M-Pesa, Airtel Money, or Telkom number.</p>
+      </div>
+      <button class="btn-primary" onclick="handleActivate()" id="activate-btn">Pay & Activate</button>
+    </div>
+    <div id="payment-form" class="card" style="display:none;">
+      <div class="card-header"><span class="card-title">Withdraw Funds</span></div>
+      <div class="withdraw-form">
+        <div class="form-group"><label>Amount (KES)</label><input type="number" id="withdraw-amount" placeholder="Min KES 500" min="500"></div>
+        <div class="form-group"><label>Phone Number</label><input type="tel" id="withdraw-phone" placeholder="e.g. 254712345678"></div>
+        <div class="form-group">
+          <label>Payment Provider</label>
+          <div class="provider-options" id="withdraw-providers">
+            <div class="provider-option selected" data-provider="safaricom" onclick="selectWithdrawProvider(this)"><div class="provider-icon">📱</div><div class="provider-name">Safaricom</div></div>
+            <div class="provider-option" data-provider="airtel" onclick="selectWithdrawProvider(this)"><div class="provider-icon">📲</div><div class="provider-name">Airtel</div></div>
+            <div class="provider-option" data-provider="telkom" onclick="selectWithdrawProvider(this)"><div class="provider-icon">📞</div><div class="provider-name">Telkom</div></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="handleWithdraw()">Withdraw Now</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-profile" class="tab-content">
+    <div class="profile-section">
+      <div class="profile-avatar" id="profile-avatar">Q</div>
+      <div class="profile-name" id="profile-name">User</div>
+      <div class="profile-phone" id="profile-phone">-</div>
+      <span class="tier-badge tier-silver" id="profile-tier" style="display:inline-block;margin-top:8px;">Silver</span>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value" id="profile-earnings">0</div><div class="stat-label">Total Earnings</div></div>
+      <div class="stat-card"><div class="stat-value" id="profile-tasks">0</div><div class="stat-label">Tasks Done</div></div>
+      <div class="stat-card"><div class="stat-value" id="profile-tier-name">Silver</div><div class="stat-label">Tier</div></div>
+      <div class="stat-card"><div class="stat-value" id="profile-status">Not Activated</div><div class="stat-label">Withdraw Status</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Account Details</span></div>
+      <div style="font-size:13px;color:#555;">
+        <p style="margin-bottom:8px;">Username: <span style="color:#1a1a2e;font-weight:600;" id="detail-username">-</span></p>
+        <p style="margin-bottom:8px;">Phone: <span style="color:#1a1a2e;font-weight:600;" id="detail-phone">-</span></p>
+        <p style="margin-bottom:8px;">Tier: <span style="color:#764ba2;font-weight:600;" id="detail-tier">Silver</span></p>
+        <p style="margin-bottom:8px;">Withdrawal: <span id="detail-activated" style="color:#ff4444;font-weight:600;">Not Activated</span></p>
+        <p>Activation Fee: <span style="color:#764ba2;font-weight:600;" id="detail-fee">KES 199</span></p>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="handleLogout()">Logout</button>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active nav-tasks" onclick="switchTab('tasks')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span>Tasks</span>
+    </div>
+    <div class="nav-item nav-earnings" onclick="switchTab('earnings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      <span>Earnings</span>
+    </div>
+    <div class="nav-item nav-payment" onclick="switchTab('payment')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span>Payment</span>
+    </div>
+    <div class="nav-item nav-profile" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profile</span>
+    </div>
+  </div>
+</div>
+
+<div id="modal-container"></div>
+
+<script>
+const API = '';
+let token = localStorage.getItem('qca_token');
+let currentUser = JSON.parse(localStorage.getItem('qca_user') || 'null');
+let selectedSignupTier = 'silver';
+let selectedActivateProvider = 'safaricom';
+let selectedWithdrawProvider = 'safaricom';
+let currentPaymentRef = null;
+
+const TASK_TYPE_CLASSES = {
+  'Consumer Survey': 'type-survey',
+  'Product Feedback': 'type-review',
+  'Lifestyle Survey': 'type-survey',
+  'Market Research': 'type-market',
+  'Health Survey': 'type-survey',
+  'Education Survey': 'type-survey',
+  'Technology Survey': 'type-survey',
+  'Financial Survey': 'type-investment',
+  'Entertainment Survey': 'type-review',
+  'Food & Dining Survey': 'type-survey',
+  'Shopping Habits Survey': 'type-market',
+  'Fitness Survey': 'type-survey',
+  'Social Media Survey': 'type-review',
+  'Travel Survey': 'type-survey',
+  'Energy Survey': 'type-research',
+  'Water Access Survey': 'type-research',
+  'Mobile Banking Survey': 'type-investment',
+  'Parenting Survey': 'type-survey',
+  'Savings Survey': 'type-investment',
+  'Internet Access Survey': 'type-research',
+  'Housing Survey': 'type-market',
+  'Pet Care Survey': 'type-survey',
+  'Security Survey': 'type-research',
+  'Waste Management Survey': 'type-research',
+  'Airtime Survey': 'type-survey',
+  'Insurance Survey': 'type-investment',
+  'Agriculture Survey': 'type-market',
+  'Religion Survey': 'type-survey',
+  'Fashion Survey': 'type-review',
+  'Environmental Survey': 'type-research',
+  'Business Survey': 'type-corporate',
+  'Investment Analysis': 'type-investment',
+  'Digital Services Review': 'type-review',
+  'Real Estate Survey': 'type-market',
+  'Insurance Research': 'type-investment',
+  'E-commerce Survey': 'type-market',
+  'Agriculture Research': 'type-market',
+  'Employment Survey': 'type-corporate',
+  'Supply Chain Review': 'type-analysis',
+  'Banking Experience Survey': 'type-investment',
+  'Renewable Energy Survey': 'type-research',
+  'SME Finance Survey': 'type-investment',
+  'Telecom Services Review': 'type-review',
+  'Tourism Survey': 'type-survey',
+  'Education Quality Survey': 'type-survey',
+  'Healthcare Access Survey': 'type-research',
+  'Transport Improvement Survey': 'type-survey',
+  'Land Ownership Survey': 'type-market',
+  'Crypto Awareness Survey': 'type-investment',
+  'Remote Work Survey': 'type-corporate',
+  'Water Infrastructure Survey': 'type-research',
+  'Construction Survey': 'type-market',
+  'Tax Compliance Survey': 'type-corporate',
+  'Export Business Survey': 'type-market',
+  'Mental Health Survey': 'type-research',
+  'Matatu Industry Survey': 'type-survey',
+  'Freelance Economy Survey': 'type-corporate',
+  'County Government Survey': 'type-corporate',
+  'Diaspora Connection Survey': 'type-survey',
+  'Side Hustle Survey': 'type-market',
+  'Strategic Investment Review': 'type-strategy',
+  'Portfolio Analysis': 'type-analysis',
+  'Corporate Strategy Survey': 'type-strategy',
+  'Wealth Management Review': 'type-investment',
+  'Venture Capital Assessment': 'type-premium',
+  'Executive Leadership Survey': 'type-corporate',
+  'Market Expansion Strategy': 'type-strategy',
+  'Digital Economy Assessment': 'type-analysis',
+  'Real Estate Investment Analysis': 'type-investment',
+  'Capital Markets Review': 'type-analysis',
+  'Private Equity Assessment': 'type-investment',
+  'Treasury Management Review': 'type-investment',
+  'ESG Investment Survey': 'type-research',
+  'Tech Infrastructure Assessment': 'type-analysis',
+  'Mergers & Acquisitions Review': 'type-corporate',
+  'Diaspora Investment Survey': 'type-investment',
+  'Innovation Ecosystem Assessment': 'type-analysis',
+  'Insurance Market Review': 'type-investment',
+  'Supply Chain Finance Review': 'type-analysis',
+  'Sovereign Debt Assessment': 'type-investment',
+  'Tourism Investment Survey': 'type-market',
+  'Data Economy Assessment': 'type-analysis',
+  'Manufacturing Strategy Survey': 'type-corporate',
+  'Fintech Regulation Review': 'type-corporate',
+  'Pension Fund Strategy': 'type-investment',
+  'Agricultural Commodity Analysis': 'type-market',
+  'Digital Identity Assessment': 'type-analysis',
+  'Energy Transition Strategy': 'type-strategy',
+  'Trade Finance Innovation': 'type-analysis',
+  'Urban Development Assessment': 'type-strategy'
+};
+
+// Splash
+setTimeout(() => {
+  const splash = document.getElementById('splash');
+  if (token && currentUser) { showApp(); } else { showHomeScreen(); }
+  splash.style.opacity = '0';
+  setTimeout(() => splash.style.display = 'none', 500);
+}, 2000);
+
+function showHomeScreen() {
+  document.getElementById('home-screen').style.display = 'block';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+}
+
+function showAuthScreen(tab) {
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'block';
+  document.getElementById('app').style.display = 'none';
+  switchAuthTab(tab || 'login');
+}
+
+function showApp() {
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  updateUserUI();
+  loadTasks();
+  updatePaymentTab();
+}
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  if (tab === 'login') {
+    document.querySelectorAll('.auth-tab')[0].classList.add('active');
+    document.getElementById('login-form').classList.add('active');
+  } else {
+    document.querySelectorAll('.auth-tab')[1].classList.add('active');
+    document.getElementById('signup-form').classList.add('active');
+  }
+}
+
+function selectSignupTier(el) {
+  document.querySelectorAll('#signup-form .tier-sel-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedSignupTier = el.dataset.tier;
+}
+
+async function handleSignup() {
+  const username = document.getElementById('signup-username').value.trim();
+  const phone = document.getElementById('signup-phone').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const errEl = document.getElementById('signup-error');
+  if (!username || !phone || !password) { errEl.textContent = 'All fields required'; errEl.style.display = 'block'; return; }
+  try {
+    const res = await fetch(API + '/api/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, phone, password, tier: selectedSignupTier }) });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
+    token = data.token; currentUser = data.user;
+    localStorage.setItem('qca_token', token);
+    localStorage.setItem('qca_user', JSON.stringify(currentUser));
+    showApp();
+  } catch (e) { errEl.textContent = 'Network error'; errEl.style.display = 'block'; }
+}
+
+async function handleLogin() {
+  const phone = document.getElementById('login-phone').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  if (!phone || !password) { errEl.textContent = 'All fields required'; errEl.style.display = 'block'; return; }
+  try {
+    const res = await fetch(API + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, password }) });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error; errEl.style.display = 'block'; return; }
+    token = data.token; currentUser = data.user;
+    localStorage.setItem('qca_token', token);
+    localStorage.setItem('qca_user', JSON.stringify(currentUser));
+    showApp();
+  } catch (e) { errEl.textContent = 'Network error'; errEl.style.display = 'block'; }
+}
+
+function handleLogout() {
+  token = null; currentUser = null;
+  localStorage.removeItem('qca_token');
+  localStorage.removeItem('qca_user');
+  showHomeScreen();
+}
+
+function updateUserUI() {
+  if (!currentUser) return;
+  const u = currentUser;
+  const initial = (u.username || 'Q')[0].toUpperCase();
+  document.getElementById('header-avatar').textContent = initial;
+  document.getElementById('header-username').textContent = u.username;
+  const tierBadge = document.getElementById('header-tier');
+  tierBadge.textContent = u.tier ? u.tier.charAt(0).toUpperCase() + u.tier.slice(1) : 'Silver';
+  tierBadge.className = 'tier-badge tier-' + (u.tier || 'silver');
+  document.getElementById('profile-avatar').textContent = initial;
+  document.getElementById('profile-name').textContent = u.username;
+  document.getElementById('profile-phone').textContent = u.phone;
+  const pt = document.getElementById('profile-tier');
+  pt.textContent = tierBadge.textContent;
+  pt.className = 'tier-badge tier-' + (u.tier || 'silver');
+  document.getElementById('profile-earnings').textContent = 'KES ' + Number(u.earnings || 0).toFixed(0);
+  document.getElementById('profile-tasks').textContent = u.completed_tasks || 0;
+  document.getElementById('profile-tier-name').textContent = tierBadge.textContent;
+  document.getElementById('profile-status').textContent = u.is_activated ? 'Activated' : 'Not Activated';
+  document.getElementById('detail-username').textContent = u.username;
+  document.getElementById('detail-phone').textContent = u.phone;
+  document.getElementById('detail-tier').textContent = tierBadge.textContent;
+  const actEl = document.getElementById('detail-activated');
+  if (u.is_activated) { actEl.textContent = 'Activated'; actEl.style.color = '#10b981'; } else { actEl.textContent = 'Not Activated'; actEl.style.color = '#ff4444'; }
+  const fees = { silver: 199, gold: 299, vip: 399 };
+  document.getElementById('detail-fee').textContent = 'KES ' + (fees[u.tier] || 199);
+  // Highlight active tier in switcher
+  document.querySelectorAll('#tier-switcher .tier-sel-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tier === u.tier);
+  });
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-item')[['tasks','earnings','payment','profile'].indexOf(tab)].classList.add('active');
+  if (tab === 'payment') updatePaymentTab();
+  if (tab === 'earnings') updateEarningsTab();
+}
+
+async function switchTier(tier) {
+  try {
+    const res = await fetch(API + '/api/change-tier', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ tier }) });
+    const data = await res.json();
+    if (data.user) { currentUser = data.user; localStorage.setItem('qca_user', JSON.stringify(currentUser)); updateUserUI(); loadTasks(); }
+  } catch (e) {}
+}
+
+async function loadTasks() {
+  try {
+    const res = await fetch(API + '/api/tasks', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (data.tasks) {
+      currentUser.earnings = data.tasks.reduce((sum, t) => t.status === 'completed' ? sum + parseFloat(t.reward) : sum, parseFloat(currentUser.earnings || 0));
+      const completedCount = data.tasks.filter(t => t.status === 'completed').length;
+      document.getElementById('task-earnings').textContent = 'KES ' + Number(currentUser.earnings).toFixed(0);
+      document.getElementById('task-tier-info').textContent = (data.tierInfo?.name || 'Silver') + ' Tier - ' + completedCount + '/' + (data.tierInfo?.tasks || 30) + ' tasks done';
+      renderTasks(data.tasks);
+    }
+  } catch (e) {}
+}
+
+function renderTasks(tasks) {
+  const list = document.getElementById('tasks-list');
+  list.innerHTML = '';
+  tasks.forEach(task => {
+    const td = typeof task.task_data === 'string' ? JSON.parse(task.task_data) : task.task_data;
+    const typeClass = TASK_TYPE_CLASSES[task.task_type] || 'type-survey';
+    const card = document.createElement('div');
+    card.className = 'task-card' + (task.status === 'completed' ? ' completed' : '');
+    let optionsHtml = '';
+    if (td && td.options) {
+      optionsHtml = '<div class="task-options">' + td.options.map((o, i) =>
+        '<div class="task-option" data-task-id="' + task.id + '" data-idx="' + i + '" onclick="completeTask(' + task.id + ',' + i + ',this)">' + o + '</div>'
+      ).join('') + '</div>';
+    }
+    card.innerHTML = '<div class="task-header"><span class="task-type-badge ' + typeClass + '">' + task.task_type + '</span><span class="task-reward">+KES ' + Number(task.reward).toFixed(0) + '</span></div><div class="task-question">' + (td ? td.question : '') + '</div>' + optionsHtml;
+    list.appendChild(card);
+  });
+}
+
+async function completeTask(taskId, optIdx, el) {
+  if (el.closest('.task-card').classList.contains('completed')) return;
+  el.closest('.task-options').querySelectorAll('.task-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  try {
+    const res = await fetch(API + '/api/tasks/' + taskId + '/complete', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } });
+    const data = await res.json();
+    if (data.user) {
+      currentUser = data.user; localStorage.setItem('qca_user', JSON.stringify(currentUser));
+      updateUserUI();
+      setTimeout(() => loadTasks(), 300);
+    }
+  } catch (e) {}
+}
+
+function updateEarningsTab() {
+  if (!currentUser) return;
+  document.getElementById('earnings-balance').textContent = 'KES ' + Number(currentUser.earnings || 0).toFixed(0);
+  document.getElementById('stat-tasks').textContent = currentUser.completed_tasks || 0;
+  document.getElementById('stat-earnings').textContent = 'KES ' + Number(currentUser.earnings || 0).toFixed(0);
+  document.getElementById('stat-tier').textContent = (currentUser.tier || 'silver').charAt(0).toUpperCase() + (currentUser.tier || 'silver').slice(1);
+  document.getElementById('stat-status').textContent = currentUser.is_activated ? 'Active' : 'Free';
+}
+
+function updatePaymentTab() {
+  if (!currentUser) return;
+  document.getElementById('payment-balance').textContent = 'KES ' + Number(currentUser.earnings || 0).toFixed(0);
+  const fees = { silver: 199, gold: 299, vip: 399 };
+  if (!currentUser.is_activated) {
+    document.getElementById('activation-section').style.display = 'block';
+    document.getElementById('payment-form').style.display = 'none';
+    document.getElementById('activation-fee-display').textContent = 'KES ' + (fees[currentUser.tier] || 199);
+    document.getElementById('activation-tier-label').textContent = (currentUser.tier || 'silver').charAt(0).toUpperCase() + (currentUser.tier || 'silver').slice(1) + ' Tier Fee';
+  } else {
+    document.getElementById('activation-section').style.display = 'none';
+    document.getElementById('payment-form').style.display = 'block';
+  }
+}
+
+function selectActivateProvider(el) {
+  document.querySelectorAll('#activate-providers .provider-option').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedActivateProvider = el.dataset.provider;
+}
+
+function selectWithdrawProvider(el) {
+  document.querySelectorAll('#withdraw-providers .provider-option').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedWithdrawProvider = el.dataset.provider;
+}
+
+async function handleActivate() {
+  const phone = document.getElementById('activate-phone').value.trim();
+  if (!phone) { showModal('Error', 'Please enter your phone number'); return; }
+  
+  const btn = document.getElementById('activate-btn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+  
+  try {
+    const res = await fetch(API + '/api/activate', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone })
+    });
+    const data = await res.json();
+    
+    if (!res.ok) {
+      showModal('Payment Error', data.error || 'Payment failed. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Pay & Activate';
+      return;
+    }
+    
+    currentPaymentRef = data.reference;
+    
+    if (data.stkPushSent) {
+      // STK push sent - show in-app polling modal
+      showPaymentPollingModal(data.reference, data.message, true);
+    } else if (data.redirectUrl) {
+      // Pesapal checkout - show in iframe modal
+      showIframeCheckoutModal(data.redirectUrl, data.reference);
+    } else if (data.checkoutUrl) {
+      // Pawapay checkout/polling page - show in iframe
+      showIframeCheckoutModal(data.checkoutUrl, data.reference);
+    } else {
+      showModal('Payment Initiated', data.message || 'Please check your phone to complete payment.');
+    }
+  } catch (err) {
+    showModal('Error', 'Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Pay & Activate';
+  }
+}
+
+// Show STK push polling modal (for Safaricom)
+function showPaymentPollingModal(reference, message, isSTK) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'payment-polling-modal';
+  modal.innerHTML = `
+    <div class="modal" style="max-width:380px;">
+      <div style="width:64px;height:64px;background:rgba(102,126,234,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+      </div>
+      <h3 style="font-size:18px;color:#1a1a2e;margin-bottom:8px;">${isSTK ? 'Check Your Phone' : 'Processing Payment'}</h3>
+      <p style="font-size:14px;color:#666;line-height:1.6;margin-bottom:16px;">${message || 'A payment prompt has been sent to your phone. Enter your PIN to confirm.'}</p>
+      <div id="polling-status" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;">
+        <div style="width:16px;height:16px;border:2px solid rgba(102,126,234,0.2);border-top-color:#667eea;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <span style="font-size:13px;color:#888;">Waiting for payment confirmation...</span>
+      </div>
+      <p style="font-size:11px;color:#aaa;">Reference: ${reference}</p>
+      <button class="btn-close" onclick="closePaymentModal()" style="margin-top:12px;">Close</button>
+    </div>
+  `;
+  document.getElementById('modal-container').appendChild(modal);
+  startPaymentPolling(reference);
+}
+
+// Show iframe checkout modal (for Airtel/Telkom via pesapal)
+function showIframeCheckoutModal(url, reference) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'payment-iframe-modal';
+  modal.innerHTML = `
+    <div style="width:95%;max-width:450px;height:85vh;background:#fff;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+      <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e8e8e8;flex-shrink:0;">
+        <h3 style="font-size:16px;color:#1a1a2e;">Complete Payment</h3>
+        <button onclick="closePaymentModal()" style="background:none;border:none;font-size:20px;color:#888;cursor:pointer;">&times;</button>
+      </div>
+      <div style="flex:1;position:relative;">
+        <iframe src="${url}" style="width:100%;height:100%;border:none;" allow="payment"></iframe>
+      </div>
+      <div style="padding:8px 16px;border-top:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;">
+        <div style="width:12px;height:12px;border:2px solid rgba(102,126,234,0.2);border-top-color:#667eea;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <span style="font-size:11px;color:#888;">Monitoring payment status...</span>
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-container').appendChild(modal);
+  startPaymentPolling(reference);
+}
+
+// Close payment modal
+function closePaymentModal() {
+  const pollModal = document.getElementById('payment-polling-modal');
+  const iframeModal = document.getElementById('payment-iframe-modal');
+  if (pollModal) pollModal.remove();
+  if (iframeModal) iframeModal.remove();
+  if (window._paymentPollInterval) clearInterval(window._paymentPollInterval);
+}
+
+// Poll payment status every 5 seconds
+function startPaymentPolling(reference) {
+  if (window._paymentPollInterval) clearInterval(window._paymentPollInterval);
+  
+  let attempts = 0;
+  window._paymentPollInterval = setInterval(async () => {
+    attempts++;
+    if (attempts > 36) { // 3 minutes max
+      clearInterval(window._paymentPollInterval);
+      return;
+    }
+    
+    try {
+      const res = await fetch(API + '/api/payment-status/' + reference, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      
+      if (data.status === 'completed' && data.activated) {
+        clearInterval(window._paymentPollInterval);
+        currentUser = data.user;
+        localStorage.setItem('qca_user', JSON.stringify(data.user));
+        closePaymentModal();
+        showModal('Account Activated!', 'Your account has been activated successfully! You can now withdraw your earnings.', [
+          { text: 'Continue', action: 'closeModal(); updateUserUI(); updatePaymentTab();', primary: true }
+        ]);
+      } else if (data.status === 'failed') {
+        clearInterval(window._paymentPollInterval);
+        closePaymentModal();
+        showModal('Payment Failed', 'The payment was not successful. Please try again.');
+      }
+    } catch (err) {
+      console.error('Polling error:', err);
+    }
+  }, 5000);
+}
+
+async function verifyPayment() {
+  if (!currentPaymentRef) { showModal('Error', 'No payment reference'); return; }
+  try {
+    const res = await fetch(API + '/api/verify-payment', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ reference: currentPaymentRef }) });
+    const data = await res.json();
+    if (data.success && data.user) {
+      currentUser = data.user; localStorage.setItem('qca_user', JSON.stringify(currentUser));
+      updateUserUI(); updatePaymentTab();
+      closeModal();
+      showModal('Activated!', 'Your account is now activated. You can withdraw your earnings!', [
+        { text: 'Great!', action: 'closeModal()', primary: true }
+      ]);
+    } else {
+      showModal('Pending', data.message || 'Payment not confirmed yet. Please wait and try again.');
+    }
+  } catch (e) { showModal('Error', 'Network error'); }
+}
+
+async function handleWithdraw() {
+  const amount = document.getElementById('withdraw-amount').value;
+  const phone = document.getElementById('withdraw-phone').value.trim();
+  if (!amount || !phone) { showModal('Error', 'Fill in all fields'); return; }
+  if (parseFloat(amount) < 500) { showModal('Error', 'Minimum withdrawal is KES 500'); return; }
+  try {
+    const res = await fetch(API + '/api/withdraw', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ amount, phone, provider: selectedWithdrawProvider }) });
+    const data = await res.json();
+    if (!res.ok) {
+      if (data.needsActivation) { showModal('Activation Required', 'Please activate your account first. Go to the Payment tab to activate.'); updatePaymentTab(); return; }
+      showModal('Error', data.error || 'Withdrawal failed'); return;
+    }
+    if (data.user) { currentUser = data.user; localStorage.setItem('qca_user', JSON.stringify(currentUser)); updateUserUI(); updatePaymentTab(); }
+    showModal('Withdrawal Initiated', 'KES ' + amount + ' withdrawal is being processed. You will receive the funds on your ' + selectedWithdrawProvider + ' number.', [
+      { text: 'OK', action: 'closeModal()', primary: true }
+    ]);
+  } catch (e) { showModal('Error', 'Network error'); }
+}
+
+function showModal(title, message, buttons) {
+  const container = document.getElementById('modal-container');
+  let btnsHtml = '';
+  if (buttons && buttons.length > 0) {
+    btnsHtml = buttons.map(b => '<button class="' + (b.primary ? 'btn-primary' : 'btn-close') + '" onclick="' + b.action + '">' + b.text + '</button>').join('');
+  } else {
+    btnsHtml = '<button class="btn-primary" onclick="closeModal()">OK</button>';
+  }
+  container.innerHTML = '<div class="modal-overlay" onclick="closeModal()"><div class="modal fade-in" onclick="event.stopPropagation()"><h3>' + title + '</h3><p>' + message + '</p>' + btnsHtml + '</div></div>';
+}
+
+function closeModal() {
+  document.getElementById('modal-container').innerHTML = '';
+}
+</script>
+</body>
+</html>
