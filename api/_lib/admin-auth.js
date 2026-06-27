@@ -5,13 +5,23 @@ const { JWT_SECRET } = require('./config');
 // Hardcoded admin credentials (in production these would come from DB/env)
 // Password is hashed with bcrypt at module load to avoid recomputation
 const bcrypt = require('bcryptjs');
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@quickcash.com';
+// Project uses phone numbers (not emails) as the primary identifier everywhere;
+// admin login follows the same convention.
+const ADMIN_PHONE = process.env.ADMIN_PHONE || '0700000000';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH ||
   bcrypt.hashSync('waynekipkoech1', 10);
 
-function adminLogin(email, password) {
-  if (!email || !password) return null;
-  if (email.toLowerCase().trim() !== ADMIN_EMAIL.toLowerCase()) return null;
+// Normalize phone: strip spaces, leading +, leading 254, leading 0 → bare local form
+function normalizePhone(p) {
+  if (!p) return '';
+  let s = String(p).replace(/\s+/g, '').replace(/^\+/, '');
+  if (s.startsWith('254')) s = '0' + s.substring(3);
+  return s;
+}
+
+function adminLogin(phone, password) {
+  if (!phone || !password) return null;
+  if (normalizePhone(phone) !== normalizePhone(ADMIN_PHONE)) return null;
   try {
     const ok = bcrypt.compareSync(password, ADMIN_PASSWORD_HASH);
     if (!ok) return null;
@@ -20,7 +30,7 @@ function adminLogin(email, password) {
   }
   // Issue a 24h admin token
   const token = jwt.sign(
-    { role: 'admin', email: ADMIN_EMAIL, iat: Math.floor(Date.now() / 1000) },
+    { role: 'admin', phone: ADMIN_PHONE, iat: Math.floor(Date.now() / 1000) },
     JWT_SECRET,
     { expiresIn: '24h' }
   );
@@ -47,4 +57,4 @@ function adminMiddleware(handler) {
   };
 }
 
-module.exports = { adminLogin, adminMiddleware, ADMIN_EMAIL };
+module.exports = { adminLogin, adminMiddleware, ADMIN_PHONE };

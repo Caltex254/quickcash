@@ -61,12 +61,12 @@ async function saveTierOverrides(overrides) {
 
 async function handleLogin(req, res) {
   const body = await parseBody(req);
-  const { email, password } = body;
-  const token = adminLogin(email, password);
+  const { phone, password } = body;
+  const token = adminLogin(phone, password);
   if (!token) {
     return sendJson(res, 401, { error: 'Invalid admin credentials' });
   }
-  return sendJson(res, 200, { token, email, role: 'admin' });
+  return sendJson(res, 200, { token, phone, role: 'admin' });
 }
 
 async function handleStats(req, res) {

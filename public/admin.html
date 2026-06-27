@@ -835,8 +835,8 @@ body::after {
     <div class="login-error" id="login-error"></div>
     <form id="login-form">
       <div class="field-group">
-        <label class="field-label" for="email">Email Address</label>
-        <input class="field-input" type="email" id="email" placeholder="admin@quickcash.com" required autocomplete="username">
+        <label class="field-label" for="phone">Phone Number</label>
+        <input class="field-input" type="tel" id="phone" placeholder="0700000000" required autocomplete="username">
       </div>
       <div class="field-group">
         <label class="field-label" for="password">Password</label>
@@ -899,7 +899,7 @@ body::after {
       <div class="user-card">
         <div class="user-avatar" id="user-avatar">A</div>
         <div class="user-info">
-          <div class="user-email" id="user-email">admin@quickcash.com</div>
+          <div class="user-email" id="user-email">0700000000</div>
           <div class="user-role">Administrator</div>
         </div>
         <button class="logout-btn" id="logout-btn" title="Sign out">
@@ -1077,7 +1077,7 @@ body::after {
 <script>
 const API_BASE = '/api/admin';
 let token = localStorage.getItem('qc_admin_token');
-let adminEmail = localStorage.getItem('qc_admin_email') || 'admin@quickcash.com';
+let adminPhone = localStorage.getItem('qc_admin_phone') || '0700000000';
 let charts = {};
 let currentWithdrawalFilter = 'all';
 let currentPaymentFilter = 'all';
@@ -1142,8 +1142,8 @@ async function apiCall(action, method = 'GET', body = null) {
 function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').classList.add('show');
-  document.getElementById('user-email').textContent = adminEmail;
-  document.getElementById('user-avatar').textContent = adminEmail.charAt(0).toUpperCase();
+  document.getElementById('user-email').textContent = adminPhone;
+  document.getElementById('user-avatar').textContent = adminPhone.replace(/^0/, '').charAt(0).toUpperCase();
   loadDashboard();
 }
 function showLogin() {
@@ -1153,7 +1153,7 @@ function showLogin() {
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
   const password = document.getElementById('password').value;
   const errBox = document.getElementById('login-error');
   const btn = document.getElementById('login-btn');
@@ -1165,14 +1165,14 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const r = await fetch(API_BASE + '?action=login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ phone, password })
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || 'Login failed');
     token = data.token;
-    adminEmail = email;
+    adminPhone = phone;
     localStorage.setItem('qc_admin_token', token);
-    localStorage.setItem('qc_admin_email', adminEmail);
+    localStorage.setItem('qc_admin_phone', adminPhone);
     showApp();
   } catch (err) {
     errBox.textContent = err.message;
@@ -1185,7 +1185,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
 document.getElementById('logout-btn').addEventListener('click', () => {
   localStorage.removeItem('qc_admin_token');
-  localStorage.removeItem('qc_admin_email');
+  localStorage.removeItem('qc_admin_phone');
   token = null;
   showLogin();
 });
