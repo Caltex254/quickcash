@@ -1,7 +1,6 @@
 {
   "version": 2,
   "name": "quickcash-agency",
-  "public": true,
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
